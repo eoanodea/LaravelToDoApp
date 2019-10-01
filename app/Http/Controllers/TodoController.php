@@ -68,7 +68,10 @@ class TodoController extends Controller
      */
     public function show($id)
     {
-        //
+        $todo = Todo::findOrFail($id);
+            return view('todos.show', [
+                'todo' => $todo,
+            ]);
     }
 
     /**
@@ -79,7 +82,11 @@ class TodoController extends Controller
      */
     public function edit($id)
     {
-        //
+        //Find todo by it's ID
+        $todo = Todo::findOrFail($id);
+        return view('todos.edit', [
+            'todo' => $todo,
+        ]);
     }
 
     /**
@@ -91,7 +98,27 @@ class TodoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        //validation rules
+        $rules = [
+            'title' => "required|string|unique:todos,title,{$id}|min:2|max:191",
+            'body' => 'required|string|min:5|max:1000'
+        ];
+        //custom validation error messages
+        $messages = [
+            'title.unique' => 'Todo title should be unique'
+        ];
+        //Validate the form data
+        $request->validate($rules, $messages);
+        //Update the Todo
+        $todo          = Todo::findOrFail($id);
+        $todo->title   = $request->title;
+        $todo->body    = $request->body;
+        $todo->save();
+
+        //Redirect to a specified route with flash message
+        return redirect()
+            ->route('todos.show', $id)
+            ->with('status', 'Updated the selected Todo');
     }
 
     /**
@@ -102,6 +129,12 @@ class TodoController extends Controller
      */
     public function destroy($id)
     {
-        //
+        //Delete the Todo
+        $todo = Todo::findOrFail($id);
+        $todo -> delete();
+        //Redirect to a specified route with flash message.
+        return redirect()
+            ->route('todos.index')
+            ->with('status', 'Deleted the selected Todo');
     }
 }
