@@ -7,7 +7,11 @@
     <link rel="stylesheet" href="{{asset('css/app.css')}}"> {{-- <- bootstrap css --}}
     <title>@yield('title','Web Applications Framework')</title>
 </head>
-<body style="background-position: center; background-image: url('{{asset('storage/images/'.Auth::user()->image)}}'">
+@auth
+    <body style="background-position: center; background-image: url('{{asset('storage/images/'.Auth::user()->image)}}'">
+@else
+    <body>
+@endauth
     {{-- That's how you write a comment in blade --}}
 
     @include('inc.navbar')
