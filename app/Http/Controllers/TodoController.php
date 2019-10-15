@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Todo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TodoController extends Controller
 {
@@ -18,9 +19,14 @@ class TodoController extends Controller
      */
     public function index()
     {
-        $todos = Todo::orderBy('created_at', 'desc')->paginate(8);
+        $user = Auth::user();
+        $todos = $user
+                    ->todos()
+                    ->orderBy('created_at', 'desc')
+                    ->paginate(8);
+
         return view('todos.index', [
-            'todos' => $todos,
+            'todos' => $todos
         ]);
     }
 
@@ -57,6 +63,7 @@ class TodoController extends Controller
         $todo = new Todo;
         $todo->title = $request->title;
         $todo->body = $request->body;
+        $todo->user_id = Auth::id();
         $todo->save(); // save it to the database.
         //Redirect to a specified route with flash message.
         return redirect()
